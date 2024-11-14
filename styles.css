@@ -1,0 +1,119 @@
+:root {
+    --cell-size: 100px;
+    --color: #333;
+    --color-set: #000;
+    --l: 10px;
+}
+
+body {
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f0f0f0;
+}
+
+.board {
+    display: grid;
+    grid-template-columns: repeat(3, var(--cell-size));
+    gap: 5px;
+}
+
+.cell {
+    width: var(--cell-size);
+    height: var(--cell-size);
+    background-color: #fff;
+    border: 2px solid #000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2em;
+    cursor: pointer;
+    position: relative;
+}
+
+.cell:nth-child(1),
+.cell:nth-child(2),
+.cell:nth-child(3) {
+    border-top: none;
+}
+
+.cell:nth-child(1),
+.cell:nth-child(4),
+.cell:nth-child(7) {
+    border-left: none;
+}
+
+.cell:nth-child(3),
+.cell:nth-child(6),
+.cell:nth-child(9) {
+    border-right: none;
+}
+
+.cell:nth-child(7),
+.cell:nth-child(8),
+.cell:nth-child(9) {
+    border-bottom: none;
+}
+
+.cell.x::before,
+.cell.x::after {
+    content: '';
+    position: absolute;
+    width: calc(var(--cell-size) - 20px);
+    height: var(--l);
+    background-color: var(--color-set);
+}
+
+.cell.x::before {
+    transform: rotate(45deg);
+}
+
+.cell.x::after {
+    transform: rotate(-45deg);
+}
+
+.cell.circle::before {
+    content: '';
+    position: absolute;
+    width: calc(var(--cell-size) - 20px);
+    height: calc(var(--cell-size) - 20px);
+    border: var(--l) solid var(--color-set);
+    border-radius: 50%;
+}
+
+.winning-message {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: #fff;
+    font-size: 2em;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.winning-message.show {
+    display: flex;
+}
+
+.winning-message button {
+    margin-top: 20px;
+    padding: 10px 20px;
+    font-size: 1em;
+    border: none;
+    background-color: #fff;
+    color: #000;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.winning-message button:hover {
+    background-color: #000;
+    color: #fff;
+}
