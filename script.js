@@ -1,6 +1,5 @@
-// Player constants and winning combinations
-const PLAYER_X_CLASS = 'x';
-const PLAYER_O_CLASS = 'circle';
+const PLAYER_YELLOW_CLASS = 'yellow';
+const PLAYER_CYAN_CLASS = 'cyan';
 const WINNING_COMBINATIONS = [
   [0, 1, 2],
   [3, 4, 5],
@@ -9,39 +8,72 @@ const WINNING_COMBINATIONS = [
   [1, 4, 7],
   [2, 5, 8],
   [0, 4, 8],
-  [2, 4, 6]
+  [2, 4, 6],
 ];
 
-// Get HTML elements
 const cellElements = document.querySelectorAll('[data-cell]');
 const boardElement = document.getElementById('board');
 const winningMessageElement = document.getElementById('winningMessage');
-const winningMessageTextElement = document.getElementById('winningMessageText');
 const restartButton = document.getElementById('restartButton');
+const winningMessageTextElement = document.getElementById('winningMessageText');
+let isCyanTurn = false;
+const scoreYellowElement = document.querySelector('.score-yellow');
+const scoreCyanElement = document.querySelector('.score-cyan');
 
-// Game state variables
-let isPlayer_O_Turn = false;
+let scoreYellow = 0;
+let scoreCyan = 0;
 
-// Start game function
-startGame();
-restartButton.addEventListener('click', startGame);
-
-function startGame() {
-  isPlayer_O_Turn = false;
-  cellElements.forEach(cell => {
-    cell.classList.remove(PLAYER_X_CLASS);
-    cell.classList.remove(PLAYER_O_CLASS);
-    cell.removeEventListener('click', handleCellClick);
-    cell.addEventListener('click', handleCellClick, { once: true });
+function checkWin(currentClass) {
+  return WINNING_COMBINATIONS.some(combination => {
+    return combination.every(index => {
+      return cellElements[index].classList.contains(currentClass);
+    });
   });
-  setBoardHoverClass();
-  winningMessageElement.classList.remove('show');
 }
 
-// Handle cell click function
+function setBoardHoverClass() {
+  boardElement.classList.remove(PLAYER_YELLOW_CLASS);
+  boardElement.classList.remove(PLAYER_CYAN_CLASS);
+  if (isCyanTurn) {
+    boardElement.classList.add(PLAYER_CYAN_CLASS);
+  } else {
+    boardElement.classList.add(PLAYER_YELLOW_CLASS);
+  }
+}
+
+function placeMark(cell, currentClass) {
+  cell.classList.add(currentClass);
+}
+
+function swapTurns() {
+  isCyanTurn = !isCyanTurn;
+}
+
+function isDraw() {
+  return [...cellElements].every(cell => {
+    return cell.classList.contains(PLAYER_YELLOW_CLASS) || cell.classList.contains(PLAYER_CYAN_CLASS);
+  });
+}
+
+function endGame(draw) {
+  if (draw) {
+    winningMessageTextElement.innerText = "It's a draw!";
+  } else {
+    if (isCyanTurn) {
+      scoreCyan++;
+      scoreCyanElement.innerText = scoreCyan;
+    } else {
+      scoreYellow++;
+      scoreYellowElement.innerText = scoreYellow;
+    }
+    winningMessageTextElement.innerText = `Player ${isCyanTurn ? "Cyan" : "Yellow"} wins!`;
+  }
+  winningMessageElement.classList.add('show');
+}
+
 function handleCellClick(e) {
   const cell = e.target;
-  const currentClass = isPlayer_O_Turn ? PLAYER_O_CLASS : PLAYER_X_CLASS;
+  const currentClass = isCyanTurn ? PLAYER_CYAN_CLASS : PLAYER_YELLOW_CLASS;
   placeMark(cell, currentClass);
   if (checkWin(currentClass)) {
     endGame(false);
@@ -53,49 +85,17 @@ function handleCellClick(e) {
   }
 }
 
-// End game function
-function endGame(draw) {
-  if (draw) {
-    winningMessageTextElement.innerText = 'It\'s a draw!';
-  } else {
-    winningMessageTextElement.innerText = `Player with ${isPlayer_O_Turn ? "O's" : "X's"} wins!`;
-  }
-  winningMessageElement.classList.add('show');
-}
-
-// Check for draw function
-function isDraw() {
-  return [...cellElements].every(cell => {
-    return cell.classList.contains(PLAYER_X_CLASS) || cell.classList.contains(PLAYER_O_CLASS);
+function startGame() {
+  isCyanTurn = false;
+  cellElements.forEach(cell => {
+    cell.classList.remove(PLAYER_YELLOW_CLASS);
+    cell.classList.remove(PLAYER_CYAN_CLASS);
+    cell.removeEventListener('click', handleCellClick);
+    cell.addEventListener('click', handleCellClick, { once: true });
   });
+  setBoardHoverClass();
+  winningMessageElement.classList.remove('show');
 }
 
-// Place mark function
-function placeMark(cell, currentClass) {
-  cell.classList.add(currentClass);
-}
-
-// Swap turns function
-function swapTurns() {
-  isPlayer_O_Turn = !isPlayer_O_Turn;
-}
-
-// Set board hover class function
-function setBoardHoverClass() {
-  boardElement.classList.remove(PLAYER_X_CLASS);
-  boardElement.classList.remove(PLAYER_O_CLASS);
-  if (isPlayer_O_Turn) {
-    boardElement.classList.add(PLAYER_O_CLASS);
-  } else {
-    boardElement.classList.add(PLAYER_X_CLASS);
-  }
-}
-
-// Check for win function
-function checkWin(currentClass) {
-  return WINNING_COMBINATIONS.some(combination => {
-    return combination.every(index => {
-      return cellElements[index].classList.contains(currentClass);
-    });
-  });
-}
+restartButton.addEventListener('click', startGame);
+startGame();
